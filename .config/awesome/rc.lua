@@ -50,7 +50,8 @@ end
 beautiful.init("/home/jc/.config/awesome/themes/default/theme.lua")
 
 -- Set default terminal
-terminal = "alacritty"
+--terminal = "alacritty"
+terminal = "zutty"
 
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
@@ -93,6 +94,41 @@ menubar.utils.terminal = terminal -- Set terminal for applications that require 
 
 -- Keyboard map indicator and switcher
 local mykeyboardlayout = awful.widget.keyboardlayout()
+
+---------------------------------------------------------------- test -----------------------------------------
+
+--local shouldCreateWidget = true
+
+-- Create a widget for water temp
+local mywtemp = wibox.widget.textbox()
+
+-- Function to update the widget's text
+local function updateWaterTempWidget()
+    awful.spawn.easy_async("coolantemp", function(stdout)
+        mywtemp:set_markup(string.format('<span font="%s">%s</span>', "DejaVuSans bold 12", " " .. stdout))
+    end)
+end
+
+-- Update the widget when Awesome WM starts
+awesome.connect_signal("startup", function()
+    if myalta then
+        updateWaterTempWidget()
+    end
+end)
+
+---------------------------------------------------------------- test -----------------------------------------
+
+-- Create a widget for water temp
+--local mywtemp = wibox.widget.textbox()
+--awful.spawn.easy_async("coolantemp", function(stdout)
+--    mywtemp:set_markup(string.format('<span font="%s">%s</span>', "DejaVuSans bold 12", " " .. stdout))
+--end)
+
+-- Create a widget for water temp
+--local mywtemp = wibox.widget.textbox()
+--    awful.spawn.easy_async("coolantemp", function(stdout)
+--    mywtemp:set_text(" " .. stdout)
+--end)
 
 -- Create a textclock widget
 local mytextclock = wibox.widget({
@@ -157,7 +193,7 @@ if f~=nil then
 end
 
 -- Check if I am on my alta desktop monster pc.
-local f=io.open("/home/jc/.myalata","r")
+local f=io.open("/home/jc/.myalta","r")
 if f~=nil then
 	io.close(f)
 	myalta = true
@@ -183,13 +219,27 @@ awful.screen.connect_for_each_screen(function(s)
 -- My tag name
 term=  " 1 • terminal  "
 nave=  " 2 • navegador  "
-explo= " 3 • explorador "
+expl=  " 3 • explorador "
 util=  " 4 • utilidades "
 virt=  " 5 • virtualizar "
 
     -- Set my tags for each screen with their own preferred layouts.
 	awful.tag.add(term, { layout = l.tile, screen = s, selected = true, })
 	awful.tag.add(nave, { layout = l.max, screen = s, })
+
+    -- These two machines have three screens, and different tags appear on different screens.
+    if myalta then
+	    if s.index == 1 then
+		awful.tag.add(expl, { layout = l.fair, screen = s, })
+	    elseif s.index == 2 then
+		awful.tag.add(util, { layout = l.tile, screen = s, })
+	    else
+		awful.tag.add(virt, { layout = l.fair, screen = s, })
+	    end
+	    -- If these are put together with awful.tag then both vari and term are selected on start for some reason.
+	    awful.tag.add(vari, { layout = l.tile, screen = s, })
+	   awful.tag.add(virt, { layout = l.tile, screen = s, })
+    end
 
     -- Create a promptbox for each screen
     --s.mypromptbox = awful.widget.prompt()
@@ -217,7 +267,7 @@ virt=  " 5 • virtualizar "
     }
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "top", screen = s, height = 32 })
+    s.mywibox = awful.wibar({ position = "top", screen = s, height = 28 })
 
     -- Add widgets to the wibox
     s.mywibox:setup {
@@ -232,6 +282,8 @@ virt=  " 5 • virtualizar "
 	{ -- Right widget 
 	    layout = wibox.layout.fixed.horizontal,
             --mykeyboardlayout,
+	    mywtemp,
+	    myvertsep,
             mytextclock,
 	    myvertsep,
             wibox.widget.systray(),
@@ -554,28 +606,35 @@ awful.rules.rules = {
 	     name = { "Event Tester" }, }, properties = { floating = true }},
 
     {rule = { class = "Firefox" },
-    properties = { tag = "  2  •  navegador  " } },
+    properties = { tag = nave } },
+
+    --{rule = { class = "Pavucontrol" },
+    --properties = { floating = true }, 
+    --	callback = function (c)
+	--    awful.placement.centered(c, nil)
+    --	end
+    --},
 
     {rule = { class = "Pavucontrol" },
-    properties = { floating = true }, 
+    properties = { floating = true, screen = 2, tag = util }, 
     	callback = function (c)
 	    awful.placement.centered(c, nil)
     	end
     },
 
-    --{rule = { class = "Pavucontrol" },
-    --properties = { floating = true, screen = 2, tag = " 4 " }, 
-    --	callback = function (c)
-	--    awful.placement.centered(c, nil)
-    --	end
-    --},
+    {rule = { class = "Virt-manager" },
+    properties = { floating = true, screen = 2, tag = virt }, 
+    	callback = function (c)
+	    awful.placement.centered(c, nil)
+    	end
+    },
 
     -- Add titlebars to normal clients and dialogs
     --{ rule_any = {type = { "normal", "dialog" }
     --  }, properties = { titlebars_enabled = true }
     --},
     --
-    -- Add titlebars to normal clients and dialogs if and am on the myalta pc
+    -- Add titlebars to normal clients and dialogs if I am on the myalta pc
     (myalta and
         { rule_any = {type = { "normal", "dialog" }},
         properties = { titlebars_enabled = true } } or nil),
