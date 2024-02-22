@@ -60,6 +60,11 @@ theme.menu_bg_focus = "#009E60"
 -- wibar
 theme.wibar_bg = "#009E60"
 
+theme.hotkeys_font = "sans bold 12"
+theme.hotkeys_description_font = "sans 11"
+theme.hotkeys_border_color = "#009E60"
+
+
 -- Generate taglist squares:
 local taglist_square_size = dpi(6)
 theme.taglist_squares_sel = theme_assets.taglist_squares_sel(

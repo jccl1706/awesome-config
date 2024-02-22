@@ -149,15 +149,29 @@ local tasklist_buttons = gears.table.join(
         awful.button({ }, 3, function() awful.menu.client_list({ theme = { width = 250 } }) end)
 )
 
+-- Check if I am on my asus vivobook laptop.
+local f=io.open("/home/jc/.myasus","r")
+if f~=nil then
+	io.close(f)
+	myasus = true
+end
+
+-- Check if I am on my alta desktop monster pc.
+local f=io.open("/home/jc/.myalata","r")
+if f~=nil then
+	io.close(f)
+	myalta = true
+end
+
 local function set_wallpaper(s)
     if beautiful.wallpaper then
-        local wallpaper = beautiful.wallpaper
-        if type(wallpaper) == "function" then
-            wallpaper = wallpaper(s)
-        end
-	gears.wallpaper.maximized(wallpaper)
-	--gears.wallpaper.set(gears.surface(wallpaper))
-    end
+        bcwallpaper = "/home/jc/Downloads/background.jpg"
+	 if myasus then
+	      gears.wallpaper.maximized(bcwallpaper)
+	 else
+	      gears.wallpaper.set(gears.surface(bcwallpaper))
+	 end
+     end
 end
 
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
@@ -167,19 +181,18 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
 -- My tag name
-term=  " 1 term "
-nave=  " 2 nave "
-explo= " 3 explo "
-util=  " 4 utilida "
+term=  " 1 • terminal  "
+nave=  " 2 • navegador  "
+explo= " 3 • explorador "
+util=  " 4 • utilidades "
+virt=  " 5 • virtualizar "
 
-    -- Each screen has its own tag table.
-	local names = { "  1  •  terminal  ", "  2  •  navegador  ", "  3  •  vim  ", " 4 ", " 5 " }
-	local l = awful.layout.suit  -- Just to save some typing: use an alias.
-	local layouts = { l.tile, l.tile, l.floating, l.fair, l.max }
-	awful.tag(names, s, layouts)
+    -- Set my tags for each screen with their own preferred layouts.
+	awful.tag.add(term, { layout = l.tile, screen = s, selected = true, })
+	awful.tag.add(nave, { layout = l.max, screen = s, })
 
     -- Create a promptbox for each screen
-    s.mypromptbox = awful.widget.prompt()
+    --s.mypromptbox = awful.widget.prompt()
 
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
@@ -370,8 +383,8 @@ globalkeys = gears.table.join(
               {description = "open a terminal", group = "launcher"}),
     
     -- Prompt
-    awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
-              {description = "run prompt", group = "launcher"}),
+    --awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
+    --          {description = "run prompt", group = "launcher"}),
 
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
@@ -556,11 +569,17 @@ awful.rules.rules = {
 	--    awful.placement.centered(c, nil)
     --	end
     --},
-    
+
     -- Add titlebars to normal clients and dialogs
-    { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = false }
-    },
+    --{ rule_any = {type = { "normal", "dialog" }
+    --  }, properties = { titlebars_enabled = true }
+    --},
+    --
+    -- Add titlebars to normal clients and dialogs if and am on the myalta pc
+    (myalta and
+        { rule_any = {type = { "normal", "dialog" }},
+        properties = { titlebars_enabled = true } } or nil),
+    
 }
 
 -- Signals
@@ -623,9 +642,7 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
--- enable gaps
---beautiful.useless_gap = 3
-
--- autorun apps
+-- Autostart Applications
 awful.spawn.with_shell("~/.config/awesome/autorun.sh")
+
 -- }}}
