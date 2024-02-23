@@ -11,7 +11,7 @@ local themes_path = gfs.get_themes_dir()
 
 local theme = {}
 
-theme.font          = "sans 12"
+theme.font          = "Ubuntu 12"
 theme.bg_focus      = "#535d6c"
 theme.bg_urgent     = "#ff0000"
 theme.bg_minimize   = "#535d6c"
@@ -60,10 +60,12 @@ theme.menu_bg_focus = "#009E60"
 -- wibar
 theme.wibar_bg = "#009E60"
 
-theme.hotkeys_font = "sans bold 12"
-theme.hotkeys_description_font = "sans 11"
+-- hotkeys
+theme.hotkeys_font = "Ubuntu bold 11"
+theme.hotkeys_description_font = "Ubuntu 11"
 theme.hotkeys_border_color = "#009E60"
-
+theme.hotkeys_bg = "#000000"
+theme.hotkeys_modifiers_fg = "#009E60"
 
 -- Generate taglist squares:
 local taglist_square_size = dpi(6)

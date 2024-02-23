@@ -95,15 +95,15 @@ menubar.utils.terminal = terminal -- Set terminal for applications that require 
 -- Keyboard map indicator and switcher
 local mykeyboardlayout = awful.widget.keyboardlayout()
 
----------------------------------------------------------------- test -----------------------------------------
+------------------------------------------ wather temp widget ------------------------------------------------
 
 -- Create a widget for water temp
 local mywtemp = wibox.widget.textbox()
 
 -- Function to update the widget's text
 local function updateWaterTempWidget()
-    awful.spawn.easy_async("coolantemp", function(stdout)
-        mywtemp:set_markup(string.format('<span font="%s">%s</span>', "DejaVuSans 12", " " .. stdout))
+    awful.spawn.easy_async("wtemp", function(stdout)
+        mywtemp:set_markup(string.format('<span font="%s">%s</span>', "Ubuntu 12", " " .. stdout))
     end)
 end
 
@@ -114,14 +114,45 @@ awesome.connect_signal("startup", function()
     end
 end)
 
----------------------------------------------------------------- test -----------------------------------------
+------------------------------------------ wather temp widget ------------------------------------------------
+
+------------------------------------------ wather flow widget ------------------------------------------------
+
+-- Create a widget for water flow
+local mywflow = wibox.widget.textbox()
+
+-- Function to update the widget's text
+local function updateWaterFlowWidget()
+    awful.spawn.easy_async("wflow", function(stdout)
+        mywflow:set_markup(string.format('<span font="%s">%s</span>', "Ubuntu 12", " " .. stdout))
+    end)
+end
+
+-- Update the widget when Awesome WM starts
+awesome.connect_signal("startup", function()
+    if myalta then
+        updateWaterFlowWidget()
+    end
+end)
+
+-- Create a timer to update the widget every 5 seconds
+local timer = gears.timer {
+    timeout = 5,
+    autostart = true,
+    call_now = true,
+    callback = function()
+        updateWaterFlowWidget()
+    end
+}
+
+------------------------------------------ wather flow widget ------------------------------------------------
 
 -- Create a textclock widget
 local mytextclock = wibox.widget({
     {
      widget = wibox.widget.textclock,
      format = "%a %b %d, %H:%M",
-     font = "DejaVuSans 12",
+     font = "Ubuntu 12",
      --widget = wibox.widget.textclock( '<span color="#FFFFFF" font="sans bold 12"> %a %d, %H:%M </span>', 15 )
     },
     fg = tasklist_fg_normal,
@@ -227,9 +258,6 @@ virt=  " 5 • virtualizar "
 	   awful.tag.add(virt, { layout = l.tile, screen = s, })
     end
 
-    -- Create a promptbox for each screen
-    --s.mypromptbox = awful.widget.prompt()
-
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     s.mylayoutbox = awful.widget.layoutbox(s)
@@ -256,25 +284,40 @@ virt=  " 5 • virtualizar "
     s.mywibox = awful.wibar({ position = "top", screen = s, height = 28 })
 
     -- Add widgets to the wibox
-    s.mywibox:setup {
-        layout = wibox.layout.align.horizontal,
-        { -- Left widget
-	    layout = wibox.layout.fixed.horizontal,
-        s.mylayoutbox,
-	    s.mytaglist,
-        },
-        s.mytasklist, -- Middle widget
-	--s.nill,
+    if s.index == 1 then
+        -- I only want the system tray, clock, etc. to be on screen one and not on every screen.
+        s.mywibox:setup {
+            layout = wibox.layout.align.horizontal,
+            { -- Left widget
+	        layout = wibox.layout.fixed.horizontal,
+            s.mylayoutbox,
+	        s.mytaglist,
+            },
+            s.mytasklist, -- Middle widget
+	        --s.nill,
 	{ -- Right widget 
 	    layout = wibox.layout.fixed.horizontal,
             --mykeyboardlayout,
-	    mywtemp,
-	    myvertsep,
-        mytextclock,
-	    myvertsep,
-        wibox.widget.systray(),
+            mywflow,
+	        mywtemp,
+	        myvertsep,
+            mytextclock,
+	        myvertsep,
+            wibox.widget.systray(),
         },
     }
+else
+    s.mywibox:setup {
+            layout = wibox.layout.align.horizontal,
+			{ layout = wibox.layout.fixed.horizontal,
+			s.mytaglist,
+			},
+			s.mytasklist,
+			{ layout = wibox.layout.fixed.horizontal,
+			s.mylayoutbox,
+			},
+        }
+    end
 end)
 
 -- Mouse binding when I click on an empty screen
@@ -349,28 +392,28 @@ globalkeys = gears.table.join(
     awful.key({ modkey }, "s", hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
 
-    -- Horizontal Vim navegation keys to go left and right on tags.
-    awful.key({ modkey }, "Left", function() view_prev_tag_with_client() end,
+    -- Horizontal navegation keys to go left and right on tags.
+    awful.key({ altkey }, "h", function() view_prev_tag_with_client() end,
               {description = "view previous", group = "tag"}),
-    awful.key({ modkey }, "Right", function() view_next_tag_with_client() end,
+    awful.key({ altkey }, "l", function() view_next_tag_with_client() end,
               {description = "view next", group = "tag"}),
     
     -- I use "Left" and "Right" to go to the next client or next in reverse.
-    awful.key({ ctrlkey }, "Right",function () awful.client.focus.byidx( 1) end,
+    awful.key({ ctrlkey, altkey }, "Right",function () awful.client.focus.byidx( 1) end,
               {description = "focus next by index", group = "client"}),
-    awful.key({ ctrlkey }, "Left", function () awful.client.focus.byidx(-1) end,
+    awful.key({ ctrlkey, altkey }, "Left", function () awful.client.focus.byidx(-1) end,
               {description = "focus previous by index", group = "client"}),
 
-    --  Vertical "Left" and "Right" navegation keys to swap client.
+    -- "Left" and "Right" navegation keys to swap client.
     awful.key({ modkey, ctrlkey }, "Right", function () awful.client.swap.byidx(  1) end,
               {description = "swap with next client by index", group = "client"}),
     awful.key({ modkey, ctrlkey }, "Left", function () awful.client.swap.byidx( -1) end,
               {description = "swap with previous client by index", group = "client"}),
     
-    -- Horizontal Vim navegation keys to go left and right a screen.
-    awful.key({ modkey }, "h", function () awful.screen.focus_relative( 1) end,
+    -- Horizontal navegation keys to go left and right a screen.
+    awful.key({ modkey }, "Left", function () awful.screen.focus_relative( 1) end,
               {description = "focus the next screen", group = "screen"}),
-    awful.key({ modkey }, "l", function () awful.screen.focus_relative(-1) end,
+    awful.key({ modkey }, "Right", function () awful.screen.focus_relative(-1) end,
               {description = "focus the previous screen", group = "screen"}),
 
     -- Horizontal Vim navigation keys to move the client to the next or previous tag and follow there.
@@ -594,6 +637,7 @@ awful.rules.rules = {
     {rule = { class = "Firefox" },
     properties = { screen = 1, tag = nave } },
 
+    -- Rules for my laptop and desktop computers.
     (myalta and {
         rule = { class = "Pavucontrol" },
         properties = { floating = true, screen = 2, tag = util }, 
@@ -616,13 +660,13 @@ awful.rules.rules = {
     --	end
     --},
 
-    {
+    (myalta and {
         rule = { class = "Virt-manager" },
         properties = { floating = true, screen = 2, tag = virt }, 
     	callback = function (c)
 	        awful.placement.centered(c, nil)
     	end
-    },
+    } or nil),
 
     -- Add titlebars to normal clients and dialogs if I am on the myalta pc
     (myalta and {
@@ -671,7 +715,7 @@ client.connect_signal("request::titlebars", function(c)
         { -- Middle
             { -- Title
                 align  = "center",
-		font   = "Intervariable Bold 12",
+		        font   = "Ubuntu 12",
                 widget = awful.titlebar.widget.titlewidget(c)
             },
             buttons = buttons,
