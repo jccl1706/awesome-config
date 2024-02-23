@@ -97,15 +97,13 @@ local mykeyboardlayout = awful.widget.keyboardlayout()
 
 ---------------------------------------------------------------- test -----------------------------------------
 
---local shouldCreateWidget = true
-
 -- Create a widget for water temp
 local mywtemp = wibox.widget.textbox()
 
 -- Function to update the widget's text
 local function updateWaterTempWidget()
     awful.spawn.easy_async("coolantemp", function(stdout)
-        mywtemp:set_markup(string.format('<span font="%s">%s</span>', "DejaVuSans bold 12", " " .. stdout))
+        mywtemp:set_markup(string.format('<span font="%s">%s</span>', "DejaVuSans 12", " " .. stdout))
     end)
 end
 
@@ -118,24 +116,12 @@ end)
 
 ---------------------------------------------------------------- test -----------------------------------------
 
--- Create a widget for water temp
---local mywtemp = wibox.widget.textbox()
---awful.spawn.easy_async("coolantemp", function(stdout)
---    mywtemp:set_markup(string.format('<span font="%s">%s</span>', "DejaVuSans bold 12", " " .. stdout))
---end)
-
--- Create a widget for water temp
---local mywtemp = wibox.widget.textbox()
---    awful.spawn.easy_async("coolantemp", function(stdout)
---    mywtemp:set_text(" " .. stdout)
---end)
-
 -- Create a textclock widget
 local mytextclock = wibox.widget({
     {
      widget = wibox.widget.textclock,
      format = "%a %b %d, %H:%M",
-     font = "sans bold 12",
+     font = "DejaVuSans 12",
      --widget = wibox.widget.textclock( '<span color="#FFFFFF" font="sans bold 12"> %a %d, %H:%M </span>', 15 )
     },
     fg = tasklist_fg_normal,
@@ -274,7 +260,7 @@ virt=  " 5 • virtualizar "
         layout = wibox.layout.align.horizontal,
         { -- Left widget
 	    layout = wibox.layout.fixed.horizontal,
-            s.mylayoutbox,
+        s.mylayoutbox,
 	    s.mytaglist,
         },
         s.mytasklist, -- Middle widget
@@ -284,9 +270,9 @@ virt=  " 5 • virtualizar "
             --mykeyboardlayout,
 	    mywtemp,
 	    myvertsep,
-            mytextclock,
+        mytextclock,
 	    myvertsep,
-            wibox.widget.systray(),
+        wibox.widget.systray(),
         },
     }
 end)
@@ -606,7 +592,7 @@ awful.rules.rules = {
 	     name = { "Event Tester" }, }, properties = { floating = true }},
 
     {rule = { class = "Firefox" },
-    properties = { tag = nave } },
+    properties = { screen = 1, tag = nave } },
 
     (myalta and {
         rule = { class = "Pavucontrol" },
@@ -630,13 +616,6 @@ awful.rules.rules = {
     --	end
     --},
 
-    --{rule = { class = "Pavucontrol" },
-    --properties = { floating = true, screen = 2, tag = util }, 
-    --	callback = function (c)
-	--    awful.placement.centered(c, nil)
-    --	end
-    --},
-
     {
         rule = { class = "Virt-manager" },
         properties = { floating = true, screen = 2, tag = virt }, 
@@ -645,11 +624,6 @@ awful.rules.rules = {
     	end
     },
 
-    -- Add titlebars to normal clients and dialogs
-    --{ rule_any = {type = { "normal", "dialog" }
-    --  }, properties = { titlebars_enabled = true }
-    --},
-    --
     -- Add titlebars to normal clients and dialogs if I am on the myalta pc
     (myalta and {
          rule_any = {type = { "normal", "dialog" }},
