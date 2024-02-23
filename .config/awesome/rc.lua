@@ -594,7 +594,7 @@ awful.rules.rules = {
                      keys = clientkeys,
                      buttons = clientbuttons,
                      screen = awful.screen.preferred,
-		     size_hints_honor = false,
+		             size_hints_honor = false,
                      placement = awful.placement.no_overlap+awful.placement.no_offscreen
      }
     },
@@ -608,6 +608,21 @@ awful.rules.rules = {
     {rule = { class = "Firefox" },
     properties = { tag = nave } },
 
+    (myalta and {
+        rule = { class = "Pavucontrol" },
+        properties = { floating = true, screen = 2, tag = util }, 
+        callback = function (c)
+            awful.placement.centered(c, nil)
+        end
+    } or
+    (myasus and {
+        rule = { class = "Pavucontrol" },
+        properties = { floating = true, screen = 1, tag = util },
+        callback = function (c)
+            awful.placement.centered(c, nil)
+        end
+    } or nil)),
+
     --{rule = { class = "Pavucontrol" },
     --properties = { floating = true }, 
     --	callback = function (c)
@@ -615,17 +630,18 @@ awful.rules.rules = {
     --	end
     --},
 
-    {rule = { class = "Pavucontrol" },
-    properties = { floating = true, screen = 2, tag = util }, 
-    	callback = function (c)
-	    awful.placement.centered(c, nil)
-    	end
-    },
+    --{rule = { class = "Pavucontrol" },
+    --properties = { floating = true, screen = 2, tag = util }, 
+    --	callback = function (c)
+	--    awful.placement.centered(c, nil)
+    --	end
+    --},
 
-    {rule = { class = "Virt-manager" },
-    properties = { floating = true, screen = 2, tag = virt }, 
+    {
+        rule = { class = "Virt-manager" },
+        properties = { floating = true, screen = 2, tag = virt }, 
     	callback = function (c)
-	    awful.placement.centered(c, nil)
+	        awful.placement.centered(c, nil)
     	end
     },
 
@@ -635,9 +651,10 @@ awful.rules.rules = {
     --},
     --
     -- Add titlebars to normal clients and dialogs if I am on the myalta pc
-    (myalta and
-        { rule_any = {type = { "normal", "dialog" }},
-        properties = { titlebars_enabled = true } } or nil),
+    (myalta and {
+         rule_any = {type = { "normal", "dialog" }},
+        properties = { titlebars_enabled = true } 
+    } or nil),
     
 }
 
