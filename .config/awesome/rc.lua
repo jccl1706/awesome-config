@@ -95,7 +95,7 @@ menubar.utils.terminal = terminal -- Set terminal for applications that require 
 -- Keyboard map indicator and switcher
 local mykeyboardlayout = awful.widget.keyboardlayout()
 
------------------------------------------- wather temp widget ------------------------------------------------
+------------------------------------------ water temp widget ------------------------------------------------
 
 -- Create a widget for water temp
 local mywtemp = wibox.widget.textbox()
@@ -114,9 +114,18 @@ awesome.connect_signal("startup", function()
     end
 end)
 
------------------------------------------- wather temp widget ------------------------------------------------
+local timer = gears.timer {
+    timeout = 5,
+    autostart = true,
+    call_now = true,
+    callback = function()
+        updateWaterTempWidget()
+    end
+}
 
------------------------------------------- wather flow widget ------------------------------------------------
+------------------------------------------ water temp widget ------------------------------------------------
+
+------------------------------------------ water flow widget ------------------------------------------------
 
 -- Create a widget for water flow
 local mywflow = wibox.widget.textbox()
@@ -145,7 +154,7 @@ local timer = gears.timer {
     end
 }
 
------------------------------------------- wather flow widget ------------------------------------------------
+------------------------------------------ water flow widget ------------------------------------------------
 
 -- Create a textclock widget
 local mytextclock = wibox.widget({
@@ -216,15 +225,23 @@ if f~=nil then
 	myalta = true
 end
 
+-- Wallpaper function
 local function set_wallpaper(s)
     if beautiful.wallpaper then
-        bcwallpaper = "/home/jc/Downloads/background.jpg"
-	 if myasus then
-	      gears.wallpaper.maximized(bcwallpaper)
-	 else
-	      gears.wallpaper.set(gears.surface(bcwallpaper))
-	 end
-     end
+        local bcwallpaper
+
+        if myasus then
+            bcwallpaper = "/home/jc/.config/awesome/wall/debian_2-1920x1200.jpg"
+        elseif myalta then
+            bcwallpaper = "/home/jc/.config/awesome/wall/hong_kong_3-5120x1440.jpg"
+        end
+        
+        if myasus then
+            gears.wallpaper.maximized(bcwallpaper)
+        else
+            gears.wallpaper.set(gears.surface(bcwallpaper))
+        end
+    end
 end
 
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
@@ -412,9 +429,9 @@ globalkeys = gears.table.join(
     
     -- Horizontal navegation keys to go left and right a screen.
     awful.key({ modkey }, "Left", function () awful.screen.focus_relative( 1) end,
-              {description = "focus the next screen", group = "screen"}),
-    awful.key({ modkey }, "Right", function () awful.screen.focus_relative(-1) end,
               {description = "focus the previous screen", group = "screen"}),
+    awful.key({ modkey }, "Right", function () awful.screen.focus_relative(-1) end,
+              {description = "focus the next screen", group = "screen"}),
 
     -- Horizontal Vim navigation keys to move the client to the next or previous tag and follow there.
     awful.key({ modkey, altkey }, "Left", function (c) move_to_previous_tag() end,
@@ -463,10 +480,6 @@ globalkeys = gears.table.join(
     awful.key({ modkey }, "Return", function () awful.spawn(terminal) end,
               {description = "open a terminal", group = "launcher"}),
     
-    -- Prompt
-    --awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
-    --          {description = "run prompt", group = "launcher"}),
-
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"})
@@ -662,7 +675,7 @@ awful.rules.rules = {
 
     (myalta and {
         rule = { class = "Virt-manager" },
-        properties = { floating = true, screen = 2, tag = virt }, 
+        properties = { floating = true, switchtotag = true, screen = 2, tag = virt }, 
     	callback = function (c)
 	        awful.placement.centered(c, nil)
     	end
