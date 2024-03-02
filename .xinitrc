@@ -1,4 +1,4 @@
-[[ -f ~/.Xresourcess ]] && xrdb -merge -I$HOME ~/.Xresourcess
+xrdb -merge ~/.Xresourcess
 
 ## start awesome
 exec awesome
