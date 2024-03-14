@@ -113,3 +113,19 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+<<<<<<< HEAD
+=======
+
+# for qt5ct
+#export QT_QPA_PLATFORMTHEME=qt5ct
+. "$HOME/.cargo/env"
+
+# Start keychain
+eval $(keychain --eval --quiet id_rsa)
+
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+  eval `ssh-agent -s`
+  ssh-add
+fi
+
+>>>>>>> ceb5dad86ba91a3b152c0f21ada1489f4104a824
