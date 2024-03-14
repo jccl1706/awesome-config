@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Get the CPU temperature using the sensors command and extract the line containing "Package id 0"
+cpu_temp_raw=$(sensors | grep "Package id 0" | awk '{print $4}')
+
+# Remove the '+' sign from the temperature
+cpu_temp=$(echo "$cpu_temp_raw" | tr -d '+')
+
+# Output the extracted temperature
+echo " $cpu_temp "
+

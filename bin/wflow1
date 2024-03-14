@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Define the icon
+icon="󰞍 "
+
+# Extract the flow rate from the sensors command
+flow_rate=$(sensors | awk '/Flow \[dL\/h\]:/ {print $3}')
+
+# Check if the flow rate was found
+if [ -z "$flow_rate" ]; then
+    echo "Flow rate not found."
+else
+    # Extract only the first three characters of the flow rate
+    first_three_chars=${flow_rate:0:3}
+
+    # Output the result with spaces around it
+    echo " ${icon} ${first_three_chars} "
+fi

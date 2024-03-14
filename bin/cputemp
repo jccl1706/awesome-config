@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Fetch all core temperatures and store them in an array
+readarray -t temps <<< "$(sensors | awk '/^Core/ {print $3}' | tr -d '+°C')"
+
+# Initialize sum and count variables
+sum=0
+count=0
+
+# Sum up all temperatures and count them
+for temp in "${temps[@]}"; do
+    sum=$(echo "$sum + $temp" | bc)
+    ((count++))
+done
+
+# Calculate the average temperature
+if [ $count -gt 0 ]; then
+    avg=$(echo "scale=0; $sum / $count + 0.5" | bc)
+    echo "$avg°C"
+else
+    echo "No CPU temperature readings found."
+fi
